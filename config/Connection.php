@@ -1,27 +1,39 @@
 <?php
 
-namespace Config;
+namespace config;
+
+use PDO;
+use PDOException;
 
 class Connection {
 
+    private $host;
+    private $username;
+    private $port;
+    private $password;
+    private $database;
     private $pdo;
 
-    public function __construct(
-        private $host = 'localhost',
-        private $username = 'root',
-        private $password = '',
-        private $database = 'cccat_13'
-    )
+
+    public function __construct()
     {
+        $this->host = 'mysql';
+        $this->username = 'root';
+        $this->password = '';
+        $this->database = 'cccat_13';
         $this->connect();
     }
 
     public function connect() {
-        $dsn = "mysql:host={$this->host};dbname={$this->database}";
+        $connectionString = "mysql:host={$this->host};dbname={$this->database};port=3306;charset=UTF8";
 
         try {
-            $this->pdo = new PDO($dsn, $this->username, $this->password);
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $this->pdo = new PDO(
+                $connectionString, $this->username, $this->password, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ
+                ]
+            );
         } catch (PDOException $e) {
             die("Connection failed: " . $e->getMessage());
         }
