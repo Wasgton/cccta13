@@ -11,8 +11,8 @@ services:
      tty: true
      volumes:
        - ./:/var/www/html
-     networks:
-       - php_network
+     depends_on:
+       - db
 
    nginx:
      image: nginx:stable-alpine
@@ -26,19 +26,14 @@ services:
      depends_on:
        - db
        - php
-     networks:
-       - php_network
 
    db:
      build: ./docker/mysql/.
+     container_name: mysql
+     tty: true
      environment:
        - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-     networks:
-       - php_network
      ports:
        - "3306:3306"
      volumes:
        - ./docker/mysql/files:/var/lib/mysql
-
-networks:
-  php_network:
