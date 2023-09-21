@@ -2,6 +2,7 @@
 
 namespace config;
 
+use App\Exceptions\SQLException;
 use PDO;
 use PDOException;
 
@@ -45,7 +46,7 @@ class Connection {
             $stmt->execute($params);
             return $stmt;
         } catch (PDOException $e) {
-            die("Query failed: " . $e->getMessage());
+            throw new SQLException($e->getMessage());
         }
     }
 
