@@ -6,6 +6,7 @@ use App\Exceptions\EmailAlreadyRegisteredException;
 use App\Exceptions\InvalidCPFException;
 use App\Exceptions\InvalidEmailException;
 use App\Exceptions\InvalidNameException;
+use App\Exceptions\InvalidPlateException;
 use App\Services\AccountService;
 use PHPUnit\Framework\TestCase;
 class AccountServiceTest extends TestCase
@@ -90,16 +91,32 @@ class AccountServiceTest extends TestCase
         $passengers = (new AccountService())->signUp($firstPassengerData);
     }
 
-    public function test_should_send_verification_email_after_create_and_account()
+    public function test_should_create_a_driver()
+    {
+        $passengerData = [
+            'name' => $this->faker->name,
+            'email' => $this->faker->email,
+            'cpf' => $this->faker->cpf(false),
+            'isDriver' => 1,
+            'plate' => 'ABC1234'
+        ];
+        $response = (new AccountService())->signUp($passengerData);
+        $this->assertNotEmpty($response['account_id']);
+        $this->assertNotEmpty($response['verification_code']);
+    }
+
+    public function test_should_not_create_a_driver_with_invalid_plate()
     {
         $firstPassengerData = [
             'name' => $this->faker->name,
             'email' => $this->faker->safeEmail,
             'cpf' => $this->faker->cpf(false),
-            'isPassenger' => 1,
+            'isDriver' => 1,
+            'plate' => 'ABC-1234',
         ];
+        $this->expectException(InvalidPlateException::class);
         $passengers = (new AccountService())->signUp($firstPassengerData);
-        
     }
+
 
 }
