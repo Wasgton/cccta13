@@ -2,3 +2,7 @@
 /docker/mysql/files
 composer.lock
 /vendor
+/report/*
+.phpunit.result.cache
+test-results.xml
+```

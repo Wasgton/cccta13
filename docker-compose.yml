@@ -18,7 +18,7 @@ services:
      image: nginx:stable-alpine
      tty: true
      ports:
-       - "80:80"
+       - "8000:80"
        - "443:443"
      volumes:
        - ./:/var/www/html
