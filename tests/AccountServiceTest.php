@@ -2,15 +2,23 @@
 
 namespace Tests;
 
+use App\DAO\AccountDAO;
 use App\Exceptions\EmailAlreadyRegisteredException;
 use App\Exceptions\InvalidCPFException;
 use App\Exceptions\InvalidEmailException;
 use App\Exceptions\InvalidNameException;
 use App\Exceptions\InvalidPlateException;
+use App\MailerGateway;
 use App\Services\AccountService;
+use PHPUnit\Framework\MockObject\Exception;
+use Ramsey\Uuid\Uuid;
 
 class AccountServiceTest extends TestCase
 {
+    /**
+     * @throws Exception
+     * @throws EmailAlreadyRegisteredException
+     */
     public function test_should_create_a_passenger(): void
     {
         $passengerData = [
@@ -19,12 +27,47 @@ class AccountServiceTest extends TestCase
             'cpf' => $this->faker->cpf(false),
             'isPassenger' => 1,
         ];
-        $response = (new AccountService())->signUp($passengerData);
+        $accountDAOStub = $this->createConfiguredStub(
+            AccountDAO::class,
+            [
+                'save' => '',
+                'getById' => array_merge($passengerData,[
+                    'account_id' => Uuid::uuid4()->toString(),
+                    'verification_code' => Uuid::uuid4()->toString(),
+                ]),
+                'getByEmail' => [],
+            ]
+        );
+        $response = (new AccountService($accountDAOStub))->signUp($passengerData);
         $this->assertNotEmpty($response['account_id']);
         $this->assertNotEmpty($response['verification_code']);
         $this->assertEquals($passengerData['name'], $response['name']);
         $this->assertEquals($passengerData['email'], $response['email']);
         $this->assertEquals($passengerData['cpf'], $response['cpf']);
+    }
+
+    public function test_should_send_a_email_after_create_a_passenger(): void
+    {
+        $passengerData = [
+            'name' => $this->faker->name,
+            'email' => $this->faker->email,
+            'cpf' => $this->faker->cpf(false),
+            'isPassenger' => 1,
+        ];
+        $accountDAOStub = $this->createConfiguredStub(
+            AccountDAO::class,
+            [
+                'save' => '',
+                'getById' => array_merge($passengerData,[
+                    'account_id' => Uuid::uuid4()->toString(),
+                    'verification_code' => Uuid::uuid4()->toString(),
+                ]),
+                'getByEmail' => [],
+            ]
+        );
+        $mailerSpy = $this->createMock(MailerGateway::class);
+        $mailerSpy->expects($this->once())->method('send')->willReturn(true);
+        $response = (new AccountService($accountDAOStub, $mailerSpy))->signUp($passengerData);
     }
 
     public function test_should_not_create_a_passenger_if_email_is_already_registered()
@@ -46,7 +89,6 @@ class AccountServiceTest extends TestCase
         ];
         $this->expectException(EmailAlreadyRegisteredException::class);
         $accountService->signUp($secondPassengerData);
-
     }
 
     public function test_should_not_create_a_passenger_with_invalid_email()

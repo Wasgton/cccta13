@@ -6,28 +6,28 @@ use config\Connection;
 use PDO;
 use PDOStatement;
 
-class AccountDAO
+class AccountDAO implements AccountDAOInterface
 {
 
-    public function save(array $accountData) : PDOStatement
+    public function save(array $data)
     {
         return (new Connection())->query(
             "INSERT INTO account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, verification_code)
                  VALUES (:account_id, :name, :email, :cpf, :plate, :isPassenger, :isDriver, :verification_code)",
-            $accountData
+            $data
         );
     }
 
-    public function getById($accountId) : array
+    public function getById(string $id) : array
     {
-        $account = (new Connection())->query(
+        [$account] = (new Connection())->query(
             "SELECT * FROM account WHERE account_id = :account_id",
-            ['account_id' => $accountId]
+            ['account_id' => $id]
         )->fetchAll(PDO::FETCH_ASSOC);
-        return reset($account);
+        return $account;
     }
 
-    public function getByEmail($email) : array
+    public function getByEmail(string $email) : array
     {
         return (new Connection())->query(
             "SELECT * FROM account WHERE email = :email",
