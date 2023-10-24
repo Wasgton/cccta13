@@ -26,7 +26,7 @@ class RideDAO implements RideDAOInterface
         return $ride;
     }
 
-    public function getActiveRidesByPassengerId(mixed $passengerId)
+    public function getActiveRidesByPassengerId($passengerId)
     {
         return (new Connection())->query(
             "SELECT *
@@ -34,6 +34,28 @@ class RideDAO implements RideDAOInterface
                  WHERE passenger_id = :passenger_id
                  AND status <> 'completed'",
             ['passenger_id' => $passengerId]
+        )->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function acceptRide(array $data)
+    {
+        return (new Connection())->query(
+            "UPDATE ride
+                 SET status = :status,
+                     driver_id = :driver_id
+                 WHERE ride_id = :ride_id",
+            $data
+        );
+    }
+
+    public function getActiveRidesByDriverId($data)
+    {
+        return (new Connection())->query(
+            "SELECT *
+                 FROM ride
+                 WHERE driver_id = :driver_id
+                 AND status <> 'completed'",
+            ['driver_id' => $data]
         )->fetchAll(PDO::FETCH_ASSOC);
     }
 }

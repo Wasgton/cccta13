@@ -5,10 +5,8 @@
          cacheDirectory="./report"
          executionOrder="depends,defects"
          requireCoverageMetadata="false"
-         checkForUnintentionallyCoveredCode="true"
          beStrictAboutCoverageMetadata="true"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutCoversAnnotation="true"
          failOnRisky="true"
          failOnWarning="true">
     <testsuites>

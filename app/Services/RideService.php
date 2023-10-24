@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\DAO\AccountDAO;
 use App\DAO\RideDAO;
+use App\Exceptions\AcceptRideNotAllowed;
 use App\Exceptions\RequestRideNotAllowedException;
 use Ramsey\Uuid\Uuid;
 
@@ -44,6 +45,28 @@ class RideService
     public function getRide($ride_id)
     {
         return (new RideDAO())->getRideById($ride_id);
+    }
+
+    public function acceptRide($data)
+    {
+        $driver = $this->accountDAO->getById($data['driver_id']);
+        if (!$driver['is_driver']) {
+            throw new AcceptRideNotAllowed('Account is not from a driver');
+        }
+        $ride = $this->rideDAO->getRideById($data['ride_id']);
+        if ($ride['status'] !== 'requested') {
+            throw new AcceptRideNotAllowed("Ride wasn't requested");
+        }
+        $driversRide = $this->rideDAO->getActiveRidesByDriverId($data['driver_id']);
+        if (count($driversRide)) {
+            throw new AcceptRideNotAllowed('Driver is already in a ride');
+        }
+        $data = [
+            'driver_id' => $data['driver_id'],
+            'status' => 'accepted',
+            'ride_id' => $data['ride_id']
+        ];
+        (new RideDAO())->acceptRide($data);
     }
 
 }
