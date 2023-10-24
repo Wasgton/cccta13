@@ -13,9 +13,12 @@ $app->addBodyParsingMiddleware();
 $app->addRoutingMiddleware();
 $errorMiddleware = $app->addErrorMiddleware(true, true, true);
 
-$app->group('/api', function (RouteCollectorProxy $group){
-    $group->post('/signup', Api::class . ':signUp');
-    $group->get('/account/{accountId}', Api::class . ':getAccount');
+$app->group('/api', function (RouteCollectorProxy $route){
+    $route->post('/signup', Api::class . ':signUp');
+    $route->get('/account/{accountId}', Api::class . ':getAccount');
+
+    $route->post('/request-ride', Api::class . ':requestRide');
+    $route->get('/get-ride/{rideId}', Api::class . ':getRide');
 });
 
 

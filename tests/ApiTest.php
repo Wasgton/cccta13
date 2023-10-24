@@ -36,5 +36,39 @@ class ApiTest extends TestCase
         $this->assertEquals($input['cpf'], $responseGetAccount['cpf']);
     }
 
+    public function test_should_request_a_ride()
+    {
+        $client = new Client([
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ]
+        ]);
+        $passengerInput = [
+            'name' => $this->faker->name,
+            'email' => $this->faker->email,
+            'cpf' => $this->faker->cpf(false),
+            'isPassenger' => 1,
+        ];
+        $responseSignUp = $client->post('http://nginx/api/signup', ['body'=>json_encode($passengerInput)]);
+        $responseSignUp = json_decode($responseSignUp->getBody(), true);
+        $rideInput = [
+            'passengerId' => $responseSignUp['account_id'],
+            'from'=>[
+                'lat'=> $this->faker->localCoordinates['latitude'],
+                'long' => $this->faker->localCoordinates['longitude']
+            ],
+            'to'=>[
+                'lat'=> $this->faker->localCoordinates['latitude'],
+                'long' => $this->faker->localCoordinates['longitude']
+            ]
+        ];
+        $responseRide = $client->post('http://nginx/api/request-ride', ['body'=>json_encode($rideInput)]);
+        $responseRide = json_decode($responseRide->getBody(), true);
+        $ride = $client->get('http://nginx/api/get-ride/' . $responseRide['ride_id']);
+        $ride = json_decode($ride->getBody(), true);
+        $this->assertEquals('requested', $ride['status']);
+        $this->assertEquals($responseSignUp['account_id'], $ride['passenger_id']);
+    }
 
 }
