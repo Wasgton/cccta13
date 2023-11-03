@@ -2,28 +2,48 @@
 
 namespace App\DAO;
 
+use App\Ride;
 use config\Connection;
 use PDO;
 
 class RideDAO implements RideDAOInterface
 {
 
-    public function save($data)
+    public function save(Ride $ride)
     {
         return (new Connection())->query(
-            "INSERT INTO ride (ride_id,passenger_id, from_lat, from_long, to_lat, to_long, status)
-                 VALUES          (:ride_id,:passenger_id,:from_lat,:from_long,:to_lat,:to_long,:status)",
-            $data
+            "INSERT INTO ride (ride_id,passenger_id, from_lat, from_long, to_lat, to_long, status, date)
+                VALUES (:rideId,:passengerId,:fromLat,:fromLong,:toLat,:toLong,:status, :date)",
+            [
+                'rideId' => $ride->rideId,
+                'passengerId' => $ride->passengerId,
+                'fromLat' => $ride->fromLat,
+                'fromLong' => $ride->fromLong,
+                'toLat' => $ride->toLat,
+                'toLong' => $ride->toLong,
+                'status' => $ride->getStatus(),
+                'date' => $ride->date
+            ]
         );
     }
 
-    public function getRideById($rideId)
+    public function getRideById(string $rideId) : Ride
     {
-        [$ride] = (new Connection())->query(
+        [$data] = (new Connection())->query(
             "SELECT * FROM ride WHERE ride_id = :ride_id",
             ['ride_id' => $rideId]
         )->fetchAll(PDO::FETCH_ASSOC);
-        return $ride;
+        return Ride::restore(
+            $data['ride_id'],
+            $data['passenger_id'],
+            $data['driver_id'],
+            (double) $data['from_lat'],
+            (double) $data['from_long'],
+            (double) $data['to_lat'],
+            (double) $data['to_long'],
+            $data['status'],
+            $data['date']
+        );
     }
 
     public function getActiveRidesByPassengerId($passengerId)
@@ -37,25 +57,29 @@ class RideDAO implements RideDAOInterface
         )->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function acceptRide(array $data)
+    public function update(Ride $ride)
     {
         return (new Connection())->query(
             "UPDATE ride
                  SET status = :status,
                      driver_id = :driver_id
                  WHERE ride_id = :ride_id",
-            $data
+            [
+                'driver_id' => $ride->getDriverId(),
+                'status' => $ride->getStatus(),
+                'ride_id' => $ride->rideId
+            ]
         );
     }
 
-    public function getActiveRidesByDriverId($data)
+    public function getActiveRidesByDriverId($driver_id)
     {
         return (new Connection())->query(
             "SELECT *
                  FROM ride
                  WHERE driver_id = :driver_id
                  AND status <> 'completed'",
-            ['driver_id' => $data]
+            ['driver_id' => $driver_id]
         )->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -24,4 +24,3 @@ $app->group('/api', function (RouteCollectorProxy $route){
 
 $app->run();
 
-

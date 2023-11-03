@@ -18,7 +18,7 @@ class ApiTest extends TestCase
             ]
         ]);
         $input = [
-            'name' => $this->faker->name,
+            'name' => $this->faker->firstName.' '.$this->faker->lastName,
             'email' => $this->faker->email,
             'cpf' => $this->faker->cpf(false),
             'isPassenger' => 1,
@@ -26,8 +26,7 @@ class ApiTest extends TestCase
 
         $responseSignUp = $client->post('http://nginx/api/signup', ['body'=>json_encode($input)]);
         $responseSignUp = json_decode($responseSignUp->getBody(), true);
-
-        $responseGetAccount = $client->get('http://nginx/api/account/' . $responseSignUp['account_id']);
+        $responseGetAccount = $client->get('http://nginx/api/account/' . $responseSignUp['accountId']);
         $responseGetAccount = json_decode($responseGetAccount->getBody(), true, 512, JSON_THROW_ON_ERROR);
 
         $this->assertEquals($responseSignUp['account_id'], $responseGetAccount['account_id']);
@@ -45,7 +44,7 @@ class ApiTest extends TestCase
             ]
         ]);
         $passengerInput = [
-            'name' => $this->faker->name,
+            'name' => $this->faker->firstName.' '.$this->faker->lastName,
             'email' => $this->faker->email,
             'cpf' => $this->faker->cpf(false),
             'isPassenger' => 1,
@@ -67,8 +66,8 @@ class ApiTest extends TestCase
         $responseRide = json_decode($responseRide->getBody(), true);
         $ride = $client->get('http://nginx/api/get-ride/' . $responseRide['ride_id']);
         $ride = json_decode($ride->getBody(), true);
-        $this->assertEquals('requested', $ride['status']);
-        $this->assertEquals($responseSignUp['account_id'], $ride['passenger_id']);
+        $this->assertEquals('requested', $ride->getStatus());
+        $this->assertEquals($responseSignUp['account_id'], $ride->passengerId);
     }
 
 }

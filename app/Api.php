@@ -1,10 +1,12 @@
 <?php
 
 namespace App;
+use App\Exceptions\RequestRideNotAllowedException;
 use App\Services\AccountService;
 use App\Services\RideService;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Slim\Logger;
 
 class Api
 {
