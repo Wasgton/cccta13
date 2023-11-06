@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Faker\Provider\pt_BR\Person;
-use \PHPUnit\Framework\TestCase as baseTestCase;
+use PHPUnit\Framework\TestCase as baseTestCase;
 
 class TestCase extends baseTestCase
 {

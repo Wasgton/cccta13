@@ -2,7 +2,7 @@
 
 namespace config;
 
-use App\Exceptions\SQLException;
+use App\Application\Exceptions\SQLException;
 use PDO;
 use PDOException;
 
