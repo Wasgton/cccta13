@@ -4,7 +4,7 @@ namespace App\Infra\Repository;
 
 use App\Application\Repository\AccountDAOInterface;
 use App\Domain\Entities\Account;
-use config\Connection;
+use App\Infra\Database\PDOAdapter;
 use PDO;
 
 class AccountDAO implements AccountDAOInterface
@@ -12,7 +12,7 @@ class AccountDAO implements AccountDAOInterface
 
     public function save(Account $account)
     {
-        return (new Connection())->query(
+        return (new PDOAdapter())->query(
             "INSERT INTO account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, verification_code)
                  VALUES (:account_id, :name, :email, :cpf, :plate, :isPassenger, :isDriver, :verification_code)",
             [
@@ -30,13 +30,14 @@ class AccountDAO implements AccountDAOInterface
 
     public function getById(string $id) : Account|null
     {
-        [$account] = (new Connection())->query(
+        $result = (new PDOAdapter())->query(
             "SELECT * FROM account WHERE account_id = :account_id",
             ['account_id' => $id]
         )->fetchAll(PDO::FETCH_ASSOC);
-        if (is_null($account)) {
+        if (empty($result)) {
             return null;
         }
+        [$account] = $result;
         return Account::restore(
             $account['account_id'],
             $account['name'],
@@ -52,13 +53,14 @@ class AccountDAO implements AccountDAOInterface
 
     public function getByEmail(string $email) : Account|null
     {
-        [$account] = (new Connection())->query(
+        $result = (new PDOAdapter())->query(
             "SELECT * FROM account WHERE email = :email",
             ['email' => $email]
         )->fetchAll(PDO::FETCH_ASSOC);
-        if (is_null($account)) {
+        if (empty($result)) {
             return null;
         }
+        [$account] = $result;
         return Account::restore(
             $account['account_id'],
             $account['name'],

@@ -46,4 +46,10 @@ class AccountDAOTest extends TestCase
         $this->assertEquals($account->cpf, $savedAccount->cpf);
     }
 
+    public function test_should_return_null_when_not_find_account_by_email()
+    {
+        $savedAccount = (new AccountDAO())->getByEmail( $this->faker->email);
+        $this->assertNull($savedAccount);
+    }
+
 }
