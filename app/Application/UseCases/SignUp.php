@@ -29,9 +29,9 @@ class SignUp
             $input['name'],
             $input['email'],
             $input['cpf'],
-            $input['plate'],
-            $input['isPassenger'],
-            $input['isDriver']
+            $input['plate']??null,
+            $input['isPassenger']??null,
+            $input['isDriver']??null
         );
         $this->accountDAO->save($account);
         $this->mailerGateway->send($account->email);

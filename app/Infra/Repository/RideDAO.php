@@ -4,7 +4,7 @@ namespace App\Infra\Repository;
 
 use App\Application\Repository\RideDAOInterface;
 use App\Domain\Entities\Ride;
-use config\Connection;
+use App\Infra\Database\PDOAdapter;
 use PDO;
 
 class RideDAO implements RideDAOInterface
@@ -12,7 +12,7 @@ class RideDAO implements RideDAOInterface
 
     public function save(Ride $ride)
     {
-        return (new Connection())->query(
+        return (new PDOAdapter())->query(
             "INSERT INTO ride (ride_id,passenger_id, from_lat, from_long, to_lat, to_long, status, date)
                 VALUES (:rideId,:passengerId,:fromLat,:fromLong,:toLat,:toLong,:status, :date)",
             [
@@ -30,7 +30,7 @@ class RideDAO implements RideDAOInterface
 
     public function getRideById(string $rideId) : Ride
     {
-        [$data] = (new Connection())->query(
+        [$data] = (new PDOAdapter())->query(
             "SELECT * FROM ride WHERE ride_id = :ride_id",
             ['ride_id' => $rideId]
         )->fetchAll(PDO::FETCH_ASSOC);
@@ -49,7 +49,7 @@ class RideDAO implements RideDAOInterface
 
     public function getActiveRidesByPassengerId($passengerId)
     {
-        return (new Connection())->query(
+        return (new PDOAdapter())->query(
             "SELECT *
                  FROM ride
                  WHERE passenger_id = :passenger_id
@@ -60,7 +60,7 @@ class RideDAO implements RideDAOInterface
 
     public function update(Ride $ride)
     {
-        return (new Connection())->query(
+        return (new PDOAdapter())->query(
             "UPDATE ride
                  SET status = :status,
                      driver_id = :driver_id
@@ -75,7 +75,7 @@ class RideDAO implements RideDAOInterface
 
     public function getActiveRidesByDriverId($driver_id)
     {
-        return (new Connection())->query(
+        return (new PDOAdapter())->query(
             "SELECT *
                  FROM ride
                  WHERE driver_id = :driver_id

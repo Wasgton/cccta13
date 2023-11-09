@@ -1,12 +1,12 @@
 <?php
 
-namespace config;
+namespace App\Infra\Database;
 
 use App\Application\Exceptions\SQLException;
 use PDO;
 use PDOException;
 
-class Connection {
+class PDOAdapter implements ConnectionInterface {
 
     private $host;
     private $username;
@@ -21,12 +21,13 @@ class Connection {
         $this->host = 'mysql';
         $this->username = 'root';
         $this->password = '';
+        $this->port = "3306";
         $this->database = 'cccat_13';
         $this->connect();
     }
 
     public function connect() {
-        $connectionString = "mysql:host={$this->host};dbname={$this->database};port=3306;charset=UTF8";
+        $connectionString = "mysql:host={$this->host};dbname={$this->database};port={$this->port};charset=UTF8";
 
         try {
             $this->pdo = new PDO(

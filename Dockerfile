@@ -33,14 +33,13 @@ RUN wget -c "https://xdebug.org/files/xdebug-3.2.0.tgz"
 RUN tar -xf xdebug-3.2.0.tgz
 RUN cd xdebug-3.2.0 && phpize && ./configure && make && make install
 RUN echo "zend_extension=xdebug.so" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.mode=develop,gcstats,coverage,debug,trace,profile" >> /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.mode=develop" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.start_with_request=yes" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.client_host=host.docker.internal" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.idekey=PHPSTORM" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.client_port=9000" >> /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.discover_client_host=0" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.start_with_request=trigger" >> /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.log_level=7" >> /usr/local/etc/php/conf.d/xdebug.ini
+    && echo "xdebug.log_level=3" >> /usr/local/etc/php/conf.d/xdebug.ini
 
 RUN curl -sS https://getcomposer.org/installer | php
 RUN mv composer.phar /usr/bin/composer
