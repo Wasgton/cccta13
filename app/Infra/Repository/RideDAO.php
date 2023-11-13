@@ -28,12 +28,16 @@ class RideDAO implements RideDAOInterface
         );
     }
 
-    public function getRideById(string $rideId) : Ride
+    public function getRideById(string $rideId) : Ride|null
     {
-        [$data] = (new PDOAdapter())->query(
+        $data = (new PDOAdapter())->query(
             "SELECT * FROM ride WHERE ride_id = :ride_id",
             ['ride_id' => $rideId]
         )->fetchAll(PDO::FETCH_ASSOC);
+        if(empty($data)){
+            return null;
+        }
+        $data = [$data];
         return Ride::restore(
             $data['ride_id'],
             $data['passenger_id'],
