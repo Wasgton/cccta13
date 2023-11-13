@@ -10,7 +10,7 @@ services:
          uid: '1000'
      tty: true
      volumes:
-       - ./:/var/www/html
+       - ./backend/:/var/www/html
      depends_on:
        - db
 
