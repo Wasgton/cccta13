@@ -17,3 +17,12 @@ if (! function_exists('dd')) {
         die(1);
     }
 }
+
+if (!function_exists('log')) {
+    function log(array|string $text){
+        file_put_contents(
+            __DIR__."../logs/app.log",
+            json_encode($text) . PHP_EOL,
+        );
+    }
+}

@@ -1,0 +1,8 @@
+/.idea
+/docker/mysql/files
+/backend/composer.lock
+/backend/vendor
+/backend/tests/report/*
+/backend/.phpunit.result.cache
+/backend/test-results.xml
+```
